@@ -1,0 +1,32 @@
+# Enable mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /business/
+    
+    # Remove .php extension
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+?)/?$ index.php?url=$1 [QSA,L]
+    
+    # Prevent access to sensitive directories
+    RewriteRule ^(storage|config|database|routes)(/|$) - [F]
+    
+    # Security headers
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Deny access to hidden files and directories
+<FilesMatch "^\.|^#.*#|~$">
+    Deny from all
+</FilesMatch>
+
+# Set proper MIME types
+AddType application/x-httpd-php .php
+AddEncoding gzip .gz
+AddType application/gzip .gz
